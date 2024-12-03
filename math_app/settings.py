@@ -14,6 +14,8 @@ from os import getenv, path
 from pathlib import Path
 from django.core.management.utils import get_random_secret_key
 import dotenv
+from datetime import timedelta
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -92,7 +94,6 @@ DATABASES = {
 
 
 # Email settings
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -143,7 +144,6 @@ STATIC_ROOT = BASE_DIR / 'static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -153,14 +153,19 @@ REST_FRAMEWORK = {
     ]
 }
 
+AUTH_USER_MODEL = "api.User"
+
 DJOSER = {
-    'PASSWORD_RESET_CONFIRM_URL': 'password-reset/{uid}/{token}',
-    "SEND_ACTIVATION_EMAIL": True,
-    "ACTIVATION_URL": "activation/{uid}/{token}",
+    'SEND_ACTIVATION_EMAIL': True,
+    'ACTIVATION_URL': 'activation/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'password_reset/{uid}/{token}',
+    'USER_ID_FIELD': 'id',
+    'LOGIN_FIELD': 'username',
     'USER_CREATE_PASSWORD_RETYPE': True,
-    'PASSWORD_RESET_CONFIRM_RETYPE': True,
-    'TOKEN_MODEL': None,
+    'SERIALIZERS': {
+        'password_reset': 'api.serializers.CustomPasswordResetSerializer',
+        'user_create': 'api.serializers.UserCreateSerializer',
+        'user': 'api.serializers.UserSerializer',
+        'current_user': 'api.serializers.UserSerializer',
+    },
 }
-
-
-AUTH_USER_MODEL = "api.UserAccount"
