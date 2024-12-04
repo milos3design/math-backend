@@ -93,15 +93,6 @@ DATABASES = {
 }
 
 
-# Email settings
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = getenv('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = getenv('EMAIL_HOST_USER')
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -144,6 +135,20 @@ STATIC_ROOT = BASE_DIR / 'static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+DOMAIN = getenv('DOMAIN')
+SITE_NAME = 'SumChums'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = getenv('EMAIL_HOST_USER')
+
+AUTH_USER_MODEL = "api.User"
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -153,19 +158,18 @@ REST_FRAMEWORK = {
     ]
 }
 
-AUTH_USER_MODEL = "api.User"
-
 DJOSER = {
+    'LOGIN_FIELD': 'username',
     'SEND_ACTIVATION_EMAIL': True,
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
     'ACTIVATION_URL': 'activation/{uid}/{token}',
     'PASSWORD_RESET_CONFIRM_URL': 'password_reset/{uid}/{token}',
-    'USER_ID_FIELD': 'id',
-    'LOGIN_FIELD': 'username',
-    'USER_CREATE_PASSWORD_RETYPE': True,
     'SERIALIZERS': {
-        'password_reset': 'api.serializers.CustomPasswordResetSerializer',
         'user_create': 'api.serializers.UserCreateSerializer',
         'user': 'api.serializers.UserSerializer',
         'current_user': 'api.serializers.UserSerializer',
+        'password_reset': 'api.serializers.CustomPasswordResetSerializer',
+        'password_reset_confirm': 'api.serializers.CustomPasswordResetConfirmSerializer',
     },
 }
