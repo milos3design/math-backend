@@ -1,36 +1,36 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User
-from .forms import UserCreationForm, UserChangeForm
+from django.utils.translation import gettext_lazy as _
+from .models import User, Consent
 
+
+@admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    # Forms for adding and changing user instances
-    form = UserChangeForm
-    add_form = UserCreationForm
-
-    # Fields to display in the admin interface
-    list_display = ('username', 'email', 'is_staff', 'is_active')
-    list_filter = ('is_staff', 'is_active')
-
-    # Fieldsets for displaying user details
-    fieldsets = (
-        (None, {'fields': ('username', 'email', 'password')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser',
-                                    'groups', 'user_permissions')}),
-    )
-
-    # Fieldsets for adding a new user
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('username', 'email', 'password1', 'password2',
-                       'is_staff', 'is_active')}
-        ),
-    )
-
-    # Fields to use for searching and ordering
+    # Fields to display in the admin list view
+    list_display = ('username', 'email', 'is_active', 'is_staff', 'language_preference')
+    list_filter = ('is_active', 'is_staff', 'language_preference')
     search_fields = ('username', 'email')
     ordering = ('username',)
 
-# Register the custom User model with the admin site
-admin.site.register(User, UserAdmin)
+    # Fields to display in the user detail view
+    fieldsets = (
+        (None, {'fields': ('username', 'email', 'password')}),
+        (_('Personal Info'), {'fields': ('language_preference',)}),
+        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        (_('Important Dates'), {'fields': ('last_login',)}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'password1', 'password2', 'is_active', 'is_staff'),
+        }),
+    )
+
+
+@admin.register(Consent)
+class ConsentAdmin(admin.ModelAdmin):
+    # Fields to display in the admin list view
+    list_display = ('user', 'consent_given', 'timestamp')
+    list_filter = ('consent_given', 'timestamp')
+    search_fields = ('user__username', 'user__email')  # Search by related user fields
+    ordering = ('-timestamp',)
