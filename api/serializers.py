@@ -33,10 +33,10 @@ class CustomPasswordResetSerializer(serializers.Serializer):
             )
         return attrs
 
-    def get_user(self):
+    def get_user(self, **kwargs):
         # Retrieve the user matching the username and email
         validated_data = self.validated_data
-        return User.objects.get(username=validated_data['username'], email=validated_data['email'])
+        return User.objects.get(username=validated_data['username'], email=validated_data['email'], **kwargs)
 
 
 class CustomPasswordResetConfirmSerializer(BasePasswordResetConfirmSerializer):

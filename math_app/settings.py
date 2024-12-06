@@ -40,7 +40,7 @@ ALLOWED_HOSTS = getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 # Application definition
 
 INSTALLED_APPS = [
-    'api.apps.ApiConfig',
+    # Django default apps...
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,8 +48,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'djoser',
+    'api.apps.ApiConfig',
 ]
+    
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -66,7 +69,9 @@ ROOT_URLCONF = 'math_app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'api' / 'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -139,14 +144,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DOMAIN = getenv('DOMAIN')
 SITE_NAME = 'SumChums'
 
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = getenv('EMAIL_HOST_USER')
+
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 AUTH_USER_MODEL = 'api.User'
 
@@ -165,6 +171,7 @@ DJOSER = {
     'USER_CREATE_PASSWORD_RETYPE': True,
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
     'ACTIVATION_URL': 'activation/{uid}/{token}',
+    'SEND_CONFIRMATION_EMAIL': True,
     'PASSWORD_RESET_CONFIRM_URL': 'password_reset/{uid}/{token}',
     'SERIALIZERS': {
         'user_create': 'api.serializers.UserCreateSerializer',
