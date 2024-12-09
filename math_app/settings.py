@@ -34,6 +34,9 @@ SECRET_KEY = getenv('DJANGO_SECRET_KEY', get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv('DEBUG', 'False') == 'True'
 
+DEVELOPMENT_MODE = getenv('DEVELOPMENT_MODE', 'False') == 'True'
+
+
 ALLOWED_HOSTS = getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
 
@@ -47,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'djoser',
@@ -57,6 +61,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -134,6 +139,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static'
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -156,9 +163,25 @@ DEFAULT_FROM_EMAIL = getenv('EMAIL_HOST_USER')
 
 AUTH_USER_MODEL = 'api.User'
 
+CORS_ALLOWED_ORIGINS = getenv(
+    'CORS_ALLOWED_ORIGINS',
+    'http://localhost:3000,http://127.0.0.1:3000'
+).split(',')
+CORS_ALLOW_CREDENTIALS = True
+
+
+AUTH_COOKIE = 'access'
+#AUTH_COOKIE_MAX_AGE = 60 * 60 * 24
+AUTH_COOKIE_ACCESS_MAX_AGE = 60 * 5
+AUTH_COOKIE_REFRESH_MAX_AGE = 60 * 60 * 24
+AUTH_COOKIE_SECURE = getenv('AUTH_COOKIE_SECURE', 'True') == 'True'
+AUTH_COOKIE_HTTP_ONLY = True
+AUTH_COOKIE_PATH = '/'
+AUTH_COOKIE_SAMESITE = 'None'
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'api.authentication.CustomJWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -169,10 +192,12 @@ DJOSER = {
     'LOGIN_FIELD': 'username',
     'SEND_ACTIVATION_EMAIL': True,
     'USER_CREATE_PASSWORD_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_RETYPE': True,
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
     'ACTIVATION_URL': 'activation/{uid}/{token}',
     'SEND_CONFIRMATION_EMAIL': True,
     'PASSWORD_RESET_CONFIRM_URL': 'password_reset/{uid}/{token}',
+    'TOKEN_MODEL': None,
     'SERIALIZERS': {
         'user_create': 'api.serializers.UserCreateSerializer',
         'user': 'api.serializers.UserSerializer',

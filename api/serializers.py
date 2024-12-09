@@ -36,7 +36,10 @@ class CustomPasswordResetSerializer(serializers.Serializer):
     def get_user(self, **kwargs):
         # Retrieve the user matching the username and email
         validated_data = self.validated_data
-        return User.objects.get(username=validated_data['username'], email=validated_data['email'], **kwargs)
+        try:
+            return User.objects.get(username=validated_data['username'], email=validated_data['email'], **kwargs)
+        except:
+            raise serializers.ValidationError("No user found with the provided username and email, or the user is already registered.")
 
 
 class CustomPasswordResetConfirmSerializer(BasePasswordResetConfirmSerializer):

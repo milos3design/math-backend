@@ -32,5 +32,5 @@ class ConsentAdmin(admin.ModelAdmin):
     # Fields to display in the admin list view
     list_display = ('user', 'consent_given', 'timestamp')
     list_filter = ('consent_given', 'timestamp')
-    search_fields = ('user__username', 'user__email')  # Search by related user fields
+    search_fields = ('user__username', 'user__email')
     ordering = ('-timestamp',)
