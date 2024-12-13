@@ -36,11 +36,13 @@ DEBUG = getenv('DEBUG', 'False') == 'True'
 
 DEVELOPMENT_MODE = getenv('DEVELOPMENT_MODE', 'False') == 'True'
 
-
-ALLOWED_HOSTS = getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
-#ALLOWED_HOSTS = ['*']
-
-# Application definition
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+# if DEVELOPMENT_MODE:
+#     DEBUG = True
+#     ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+# else:
+#     DEBUG = False
+#     ALLOWED_HOSTS = getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
 INSTALLED_APPS = [
     # Django default apps...
@@ -56,7 +58,6 @@ INSTALLED_APPS = [
     'djoser',
     'api.apps.ApiConfig',
 ]
-    
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -94,24 +95,24 @@ WSGI_APPLICATION = 'math_app.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': getenv('DATABASE_NAME'),
-        'USER': getenv('DATABASE_USER'),
-        'PASSWORD': getenv('DATABASE_PASSWORD'),
-        'HOST': getenv('DATABASE_HOST'),
-        'PORT': getenv('DATABASE_PORT'),
+if DEVELOPMENT_MODE:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
-
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': getenv('DATABASE_NAME'),
+            'USER': getenv('DATABASE_USER'),
+            'PASSWORD': getenv('DATABASE_PASSWORD'),
+            'HOST': getenv('DATABASE_HOST'),
+            'PORT': getenv('DATABASE_PORT', '5432'),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -161,6 +162,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DOMAIN = getenv('DOMAIN')
 SITE_NAME = 'SumChums'
 
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = getenv('EMAIL_BACKEND')
 EMAIL_HOST = getenv('EMAIL_HOST')
 EMAIL_PORT = getenv('EMAIL_PORT')
@@ -168,8 +170,6 @@ EMAIL_USE_TLS = getenv('EMAIL_USE_TLS')
 EMAIL_HOST_USER = getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = getenv('DEFAULT_FROM_EMAIL')
-
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 AUTH_USER_MODEL = 'api.User'
 
@@ -181,7 +181,6 @@ CORS_ALLOW_CREDENTIALS = True
 
 
 AUTH_COOKIE = 'access'
-#AUTH_COOKIE_MAX_AGE = 60 * 60 * 24
 AUTH_COOKIE_ACCESS_MAX_AGE = 60 * 5
 AUTH_COOKIE_REFRESH_MAX_AGE = 60 * 60 * 24
 AUTH_COOKIE_SECURE = getenv('AUTH_COOKIE_SECURE', 'True') == 'True'

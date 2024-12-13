@@ -32,6 +32,11 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 samesite=settings.AUTH_COOKIE_SAMESITE
             )
 
+        # Remove tokens from the response body
+        response.data.pop('access', None)
+        response.data.pop('refresh', None)
+        response.data['detail'] = 'Authentication successful. Tokens set in cookies.'
+
         return response
 
 
@@ -56,6 +61,9 @@ class CustomTokenRefreshView(TokenRefreshView):
                 httponly=settings.AUTH_COOKIE_HTTP_ONLY,
                 samesite=settings.AUTH_COOKIE_SAMESITE
             )
+
+        response.data.pop('access', None)
+        response.data['detail'] = 'Token refreshed successfully. New access token set in cookie.'
 
         return response
 

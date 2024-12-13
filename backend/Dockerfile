@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     netcat-openbsd \
     ca-certificates \
     openssl \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy and install Python dependencies
